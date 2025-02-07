@@ -1,0 +1,47 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  progress Progress[]
+}
+
+model Progress {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  lessonId  Int
+  quizScore Int
+  completed Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id])
+  lesson    Lesson  @relation(fields: [lessonId], references: [id])
+}
+model Image {
+  id        Int    @id @default(autoincrement())
+  lessonId  Int
+  url       String
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+}
+model Lesson {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  images    Image[]   
+  quiz      Quiz?
+  progress  Progress[]
+}
+
+model Quiz {
+  id        Int    @id @default(autoincrement())
+  lessonId  Int    @unique
+  question  String
+  options   String[] // Array to store multiple options
+  correct   String
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+}
